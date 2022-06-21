@@ -1,24 +1,24 @@
-#
+# Set base image
 FROM python:3.9.4-slim
 
-#
+# Set workdir
 WORKDIR /app
 
-#
-COPY requirements.txt .
-
 # set env variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1 \
+    PYTHONUNBUFFERED 1
 
-#
-RUN \
+# Install packages
+RUN pip install -U pip && \
     apt update && \
+    apt install -y curl netcat && \
     apt install -y gcc python3-dev libpq-dev && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir --upgrade -r requirements.txt
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
-#
+ENV PATH="${PATH}:/root/.poetry/bin"
+
+# Copy API code
 COPY . .
 
-
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-interaction --no-ansi

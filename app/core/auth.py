@@ -7,11 +7,12 @@ from ormar import NoMatch
 
 from app.core.config import settings
 from app.core.security import verify_password
-from app.models.users import User, UserSignIn
+from app.models.users import User
+from app.schemas.users import UserSignIn
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_VERSION}/auth/token")
 
 JWTPayloadMapping = MutableMapping[str, Union[datetime, bool, str, List[str], List[int]]]
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_VERSION}/auth/login")
 
 
 async def authenticate(user_logging_in: UserSignIn) -> Optional[User]:

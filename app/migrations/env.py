@@ -7,8 +7,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.db.base import BaseMeta
-from app.models.categories import Category
-from app.models.items import Item
+from app.models.items import Category, Item
 from app.models.users import User
 
 # this is the Alembic Config object, which provides
@@ -71,7 +70,9 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata, include_schemas=True)
+        context.configure(
+            connection=connection, target_metadata=target_metadata, include_schemas=True
+        )
 
         with context.begin_transaction():
             context.run_migrations()
