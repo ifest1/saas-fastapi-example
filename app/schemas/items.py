@@ -11,7 +11,8 @@ class AddCategoryItem(BaseModel):
 
 class ItemCategoryOut(BaseModel):
     name: str
-
+    id: uuid.UUID
+    
 
 class ItemOut(BaseModel):
     id: uuid.UUID
