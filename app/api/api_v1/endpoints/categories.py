@@ -1,4 +1,6 @@
+from uuid import UUID
 from typing import List
+from ormar import NoMatch
 
 from fastapi import APIRouter, HTTPException, Path, status
 
@@ -42,13 +44,13 @@ async def update_category(category_id: int, category: Category):
     return await category_db.update(**category.dict())
 
 
-@router.delete("/{id}/", response_model=CategoryWithItemsOut)
-async def delete_category(id: int, category: Category = None):
-    if category:
-        return {"deleted_rows": await category.delete()}
-
-    category_db = await Category.objects.get(pk=id)
-    if not category:
+@router.delete("/{id}/", status_code=204)
+async def delete_category(id: UUID):
+    try:
+        category_db = await Category.objects.get(pk=id)
+    except NoMatch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Category not found.")
 
-    return {"deleted_rows": await category_db.delete()}
+    await category_db.delete()
+
+    return None
