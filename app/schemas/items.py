@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 class AddCategoryItem(BaseModel):
     item_id: uuid.UUID
-    category_id: int
+    category_id: uuid.UUID
 
 
 class ItemCategoryOut(BaseModel):
