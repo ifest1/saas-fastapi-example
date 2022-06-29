@@ -1,16 +1,17 @@
 from fastapi import APIRouter, FastAPI
 from starlette.middleware.sessions import SessionMiddleware
+from app.core.utils import initial_migration
 
-import app.db.base as base
 from app.api.api_v1.api import api_router
 from app.core.config import settings
+import app.db.base as base
 from app.middlewares.session import AnonymousUserMiddleware
 
 from fastapi.middleware.cors import CORSMiddleware
 
 
 root_router = APIRouter()
-app = FastAPI(title="FastAPI, Docker, and Traefik Ecommerce.")
+app = FastAPI(title="Ecommerce backend")
 
 origins = [
     "http://localhost:3000",
@@ -30,6 +31,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)
 
 @app.on_event("startup")
 async def startup():
+    initial_migration()
     if not base.database.is_connected:
         await base.database.connect()
 

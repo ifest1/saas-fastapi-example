@@ -4,8 +4,9 @@ sys.path = ["", ".."] + sys.path[1:]
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
+from sqlalchemy import engine_from_config, pool, event
+from sqlalchemy.schema import CreateSchema
+from sqlalchemy import exc
 from app.db.base import BaseMeta
 from app.models.items import Category, Item
 from app.models.users import User
@@ -65,17 +66,36 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+
+    def process_revision_directives(context, revision, directives):
+        script = directives[0]
+        if script.upgrade_ops.is_empty():
+            directives[:] = []
+            print("No changes in schema detected.")
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+    current_tenant = context.get_x_argument(as_dictionary=True).get("tenant")
+
+    try:
+        if current_tenant is not None:
+            connectable.execute(CreateSchema(current_tenant))
+    except Exception:
+        pass
 
     with connectable.connect() as connection:
+        connection.execute("set search_path to %s" % current_tenant)
+        connection.dialect.default_schema_name = current_tenant
+        schema_translate_map = {None: current_tenant}
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            include_schemas=True,
+            schema_translate_map=schema_translate_map,
+            version_table_schema="public",
+            process_revision_directives=process_revision_directives,
         )
 
         with context.begin_transaction():

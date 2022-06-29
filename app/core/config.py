@@ -11,5 +11,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    ALEMBIC_CONF_FILE: str = "./app/alembic.ini"
+    ALEMBIC_SCRIPT_LOCATION: str = "./app/migrations"
+
 
 settings = Settings()
