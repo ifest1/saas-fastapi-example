@@ -1,3 +1,5 @@
+# FastAPI Saas Ecommerce Boilerplate
+
 ## Local development
 ### Build
 - `docker-compose up -d --build`
