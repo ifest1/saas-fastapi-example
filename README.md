@@ -1,5 +1,3 @@
-# EcommerceBackend
-
 ## Local development
 ### Build
 - `docker-compose up -d --build`
